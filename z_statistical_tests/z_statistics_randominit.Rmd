@@ -1,0 +1,143 @@
+---
+title: "Evoman Specialist Statistical tests - randomini"
+author: "Meena Kerolos"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document: default
+  html_document: default
+header-includes:
+  - \usepackage{leading}
+  - \leading{9pt}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(digits=3)
+```
+
+
+```{r read_data, include=FALSE}
+# Read the data
+results = read.table(file="../results/Specialist_final_2/results_test_randomini.csv",header=TRUE, sep=";")
+results$method = as.factor(results$method)
+results$enemy = as.factor(results$enemy)
+```
+
+
+```{r load_libraries, include=FALSE}
+# Load libraries
+if(!require(rcompanion)){install.packages("rcompanion")}
+if(!require(FSA)){install.packages("FSA")}
+library(rcompanion)
+```
+
+# Using Scheirer–Ray–Hare test
+
+Scheirer–Ray–Hare test is a non-parametric test (doesn't have assumptions on data).
+
+```{r}
+scheirerRayHare(gain ~ method + enemy, data = results)
+```
+
+There is indeed an interaction between method and enemy
+The enemy is already known to have an effect on the outcome
+We can't test the actual effect of the method because it will already
+have an effect through the interaction.
+
+
+# Separate experiments
+
+Let's treat each enemy as a separate experimental setup
+The comparison is made between methods and we are interested in testing
+the difference between the populations of the set of outputs coming from each
+method.
+For that we will use Mann-Whitney test.
+
+## Enemy 1
+
+```{r}
+enemy1_Static = results[(results$enemy == 1) & (results$method == 'EvomanAnnNeatStatic'),]$gain
+enemy1_Dynamic = results[(results$enemy == 1) & (results$method == 'EvomanAnnNeatDynamic'),]$gain
+z = wilcox.test(enemy1_Static, enemy1_Dynamic); z
+p_value = z$p.value
+```
+
+This test is testing the null hypothesis H0: F = G which means that both sets are coming from the same population.
+
+With a p-value of `r p_value` < 0.05, we can reject that hypothesis and conclude that there is indeed a treatment effect. Here are the mean and median of each set as an estimators of the location of each population:
+
+- gain for Static method: mean=`r mean(enemy1_Static)`, median=`r median(enemy1_Static)`
+- gain for Dynamic method: mean=`r mean(enemy1_Dynamic)`, median=`r median(enemy1_Dynamic)`
+
+Considering the mean of each set as an estimator to the location of the population we see that the Dynamic method results in more gain than the Static method for enemy 1.
+
+
+## Enemy 2
+
+```{r}
+enemy2_Static = results[(results$enemy == 2) & (results$method == 'EvomanAnnNeatStatic'),]$gain
+enemy2_Dynamic = results[(results$enemy == 2) & (results$method == 'EvomanAnnNeatDynamic'),]$gain
+z = wilcox.test(enemy2_Static, enemy2_Dynamic); z
+p_value = z$p.value
+```
+
+This test is testing the null hypothesis H0: F = G which means that both sets are coming from the same population.
+
+With a p-value of `r p_value` < 0.05, we can reject that hypothesis and conclude that there is indeed a treatment effect. Here are the mean and median of each set as an estimators of the location of each population:
+
+- gain for Static method: mean=`r mean(enemy2_Static)`, median=`r median(enemy2_Static)`
+- gain for Dynamic method: mean=`r mean(enemy2_Dynamic)`, median=`r median(enemy2_Dynamic)`
+
+Considering the mean of each set as an estimator to the location of the population we see that the Static method results in more gain than the Dynamic method for enemy 2.
+
+# Enemy 3
+```{r}
+enemy3_Static = results[(results$enemy == 3) & (results$method == 'EvomanAnnNeatStatic'),]$gain
+enemy3_Dynamic = results[(results$enemy == 3) & (results$method == 'EvomanAnnNeatDynamic'),]$gain
+z = wilcox.test(enemy3_Static, enemy3_Dynamic); z
+p_value = z$p.value
+```
+
+This test is testing the null hypothesis H0: F = G which means that both sets are coming from the same population.
+
+With a p-value of `r p_value` < 0.05, we can reject that hypothesis and conclude that there is indeed a treatment effect. Here are the mean and median of each set as an estimators of the location of each population:
+
+- gain for Static method: mean=`r mean(enemy3_Static)`, median=`r median(enemy3_Static)`
+- gain for Dynamic method: mean=`r mean(enemy3_Dynamic)`, median=`r median(enemy3_Dynamic)`
+
+Considering the mean of each set as an estimator to the location of the population we see that the Static method results in more gain than the Dynamic method for enemy 3.
+
+
+# Enemy 6
+```{r}
+enemy6_Static = results[(results$enemy == 6) & (results$method == 'EvomanAnnNeatStatic'),]$gain
+enemy6_Dynamic = results[(results$enemy == 6) & (results$method == 'EvomanAnnNeatDynamic'),]$gain
+z = wilcox.test(enemy6_Static, enemy6_Dynamic); z
+p_value = z$p.value
+```
+
+This test is testing the null hypothesis H0: F = G which means that both sets are coming from the same population.
+
+With a p-value of `r p_value` > 0.05, we CANNOT reject the null hypothesis and conclude that both methods don't have different effects of the gain. Here are the mean and median of each set as an estimators of the location of each population:
+
+- gain for Static method: mean=`r mean(enemy6_Static)`, median=`r median(enemy6_Static)`
+- gain for Dynamic method: mean=`r mean(enemy6_Dynamic)`, median=`r median(enemy6_Dynamic)`
+
+
+# Enemy 7
+```{r}
+enemy7_Static = results[(results$enemy == 7) & (results$method == 'EvomanAnnNeatStatic'),]$gain
+enemy7_Dynamic = results[(results$enemy == 7) & (results$method == 'EvomanAnnNeatDynamic'),]$gain
+z = wilcox.test(enemy7_Static, enemy7_Dynamic); z
+p_value = z$p.value
+```
+
+This test is testing the null hypothesis H0: F = G which means that both sets are coming from the same population.
+
+With a p-value of `r p_value` > 0.05, we CANNOT reject that hypothesis and conclude that both methods don't have different effects of the gain. Here are the mean and median of each set as an estimators of the location of each population:
+
+- gain for Static method: mean=`r mean(enemy7_Static)`, median=`r median(enemy7_Static)`
+- gain for Dynamic method: mean=`r mean(enemy7_Dynamic)`, median=`r median(enemy7_Dynamic)`
+
+

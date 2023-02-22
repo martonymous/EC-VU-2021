@@ -1,0 +1,89 @@
+---
+title: "Evoman Generalist Statistical tests"
+author: "Meena Kerolos"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document: default
+  html_document: default
+header-includes:
+  - \usepackage{leading}
+  - \leading{9pt}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(digits=3)
+```
+
+
+```{r read_data, include=FALSE}
+# Read the data
+results = read.table(file="../results/generalist_final_1/test_all_enemies_results.csv",header=TRUE, sep=",")
+results$method = as.factor(results$method)
+results$enemy = as.factor(results$enemy)
+results$enemy_group = as.factor(results$enemy_group)
+results$gain = results$player_life - results$enemy_life
+```
+
+
+```{r load_libraries, include=FALSE}
+# Load libraries
+if(!require(rcompanion)){install.packages("rcompanion")}
+if(!require(FSA)){install.packages("FSA")}
+library(rcompanion)
+```
+
+
+# Separate experiments
+
+We will consider training against enemy group `7_8` as a different experimental setup
+from training against enemy group `3_7_8`. Therefore, training against one enemy group
+contains a set of experiments to compare between two EA instances. Each EA instance
+is tested against each of the 8 enemies. The experimental setup is factorial block
+design where the method is considered the treatment factor, the enemy is considered
+the block factor and the gain is the outcome.
+
+Scheirer–Ray–Hare test will be used as it is a non-parametric test (doesn't have
+assumptions on data).
+
+# Enemy Group 3_7_8
+
+```{r}
+results_3_7_8 = results[(results$enemy_group == '3_7_8'),]
+z = scheirerRayHare(gain ~ method + enemy, data = results_3_7_8); z
+```
+
+With a p-value of `r z$p.value[3]` > 0.05, there is no significant interaction between
+method and enemy and we can look at the effect of each of them. It is known that
+enemy effect is significant and p-value of `r z$p.value[2]` < 0.05 for the enemy
+effect supports it. However, a p-value of `r z$p.value[1]` > 0.05 for the method
+effect is not significant. Therefore, GA and DE doesn't give a significantly different
+gain when trained on enemy group `3_7_8` and tested against all enemies.
+
+
+# Enemy Group 7_8
+
+```{r}
+results_7_8 = results[(results$enemy_group == '7_8'),]
+z = scheirerRayHare(gain ~ method + enemy, data = results_7_8); z
+```
+
+With a p-value of `r z$p.value[3]` > 0.05, there is no significant interaction between
+method and enemy and we can look at the effect of each of them. It is known that
+enemy effect is significant and p-value of `r z$p.value[2]` < 0.05 for the enemy
+effect supports it. A p-value of `r z$p.value[1]` < 0.05 for the method
+effect is significant. Therefore, GA gives a higher gain than DE when trained against
+enemy group `7_8` and tested against all enemies.
+
+Here are the mean and median estimators of the gain for each method:
+
+```{r echo=F}
+results_7_8_GA_gain = results_7_8[(results_7_8$method == 'EvomanGeneralist_GA'),]$gain
+results_7_8_DE_gain = results_7_8[(results_7_8$method == 'EvomanGeneralist_DE'),]$gain
+```
+
+- gain for GA method trained against enemy group `7_8`: mean=`r mean(results_7_8_GA_gain)`, median=`r median(results_7_8_GA_gain)`
+- gain for DE method trained against enemy group `7_8`: mean=`r mean(results_7_8_DE_gain)`, median=`r median(results_7_8_DE_gain)`
+
+

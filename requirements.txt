@@ -1,0 +1,9 @@
+numpy
+pygame
+tmx
+neat-python
+pandas
+seaborn
+matplotlib
+keras
+deap
